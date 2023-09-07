@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+          # env:
+          #   - name: REDIS_PASSWORD
+          #     value: admin@123
+          volumeMounts:
+            - name: redis-config-volume
+              mountPath: /etc/redis
+      volumes:
+        - name: redis-config-volume
+          configMap:
+            name: redis-config
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+      name: http
+    - port: 443
+      nodePort: 30443
+      name: https
+  type: NodePort
+  externalIPs:
+   - "3.16.102.226"

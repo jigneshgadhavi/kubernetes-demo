@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: liquibase-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: liquibase
+  template:
+    metadata:
+      labels:
+        app: liquibase
+    spec:
+      containers:
+        - name: liquibase
+          image: liquibase/liquibase:4.17.0
+          env:
+            - name: LIQUIBASE_URL
+              value: jdbc:postgresql://postgres-service.default.svc.cluster.local:5432/sf-db
+            - name: LIQUIBASE_USERNAME
+              value: postgres
+            - name: LIQUIBASE_PASSWORD
+              value: seaflux@123
+          command: ["liquibase", "update", "--changeLogFile=changelog/changelog.xml", "--url=jdbc:postgresql://postgres-service.default.svc.cluster.local:5432/sf-db", "--username=postgres", "--password=seaflux@123", "--driver=org.postgresql.Driver"]
+          volumeMounts:
+            - name: liquibase-changelog-volume
+              mountPath: /liquibase/changelog
+      volumes:
+        - name: liquibase-changelog-volume
+          configMap:
+            name: liquibase-changelog
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"

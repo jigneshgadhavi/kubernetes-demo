@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sf-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sf-app
+  template:
+    metadata:
+      labels:
+        app: sf-app
+    spec:
+      containers:
+        - name: sf-app
+          image: 999010890957.dkr.ecr.us-east-2.amazonaws.com/node-docker-image:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000 # Adjust the port as needed
+          env:
+            - name: NODE_ENV
+              value: development
+            - name: REDIS_HOST
+              value: redis-service.default.svc.cluster.local # Redis hostname
+            - name: POSTGRES_HOST
+              value: postgres-service.default.svc.cluster.local # PostgreSQL hostname
+      imagePullSecrets:
+        - name: us-east-2-ecr-registry
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"

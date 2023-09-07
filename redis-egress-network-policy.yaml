@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-redis-egress
+spec:
+  podSelector:
+    matchLabels:
+      app: sf-app
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
